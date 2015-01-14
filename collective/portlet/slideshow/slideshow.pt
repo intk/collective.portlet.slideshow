@@ -13,17 +13,35 @@
                 <tal:events tal:repeat="obj view/results">
                     <div 
                         tal:define="item_img python:view.getImageObject(obj);
-                        item_title obj/Title;
+                        item_obj obj/getObject;
+                        item_title python: item_obj.Title();
+                        item_description python: item_obj.Description();
+                        item_text python: item_obj.text.output;
                         images item_img/@@images;
-                        scale python: images.scale('image', scale='large')">
+                        scale python: images.scale('image', scale='large')"
+
+                        tal:attributes="data-body python: item_text; data-title python: item_title; data-description python: item_description;">
                         
                         <div class="inner-bg" tal:condition="scale">
-                            <img tal:replace="structure python: scale.tag(css_class='tileImage', alt=item_title, title=item_title)"/>
+                            <img tal:replace="structure python: scale.tag(css_class='tileImage', alt='', title='')"/>
                         </div>
                     </div>
                 </tal:events>
                 <!-- Slideshow content -->
             </div> <!-- Slideshow inside -->
+            <div id="slideshow-controls" class="container">
+                <div class="col-lg-9 col-md-9 col-sm-9 col-sx-12">
+                    <p class="slide-description"><span id="slide-count"></span><span id="slide-description"></span></p>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 actions-div">
+                    <a type="button" class="btn btn-default"></a>
+                    <a type="button" class="btn btn-default info-btn hidden-xs"><i class="fa fa-info-circle"></i></a>
+                    <a type="button" class="btn btn-default play-btn playing"><i class="fa fa-pause"></i></a>
+                    <a type="button" class="btn btn-default expand-btn"><i class="fa fa-compress"></i></a>
+                    <a type="button" class="btn btn-default info-btn visible-xs"><i class="fa fa-info-circle"></i></a>
+                </div>
+            </div>
         </div> <!-- Slideshow Wrapper -->
     </div> 
 </div>
