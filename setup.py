@@ -21,7 +21,7 @@ setup(name='collective.portlet.slideshow',
       download_url='https://github.com/intk/collective.portlet.slideshow/tarball/0.0.1',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['collective'],
+      namespace_packages=['collective', 'collective.portlet'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[

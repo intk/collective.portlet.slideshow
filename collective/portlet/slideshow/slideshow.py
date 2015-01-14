@@ -21,6 +21,7 @@ from plone.i18n.normalizer.interfaces import IIDNormalizer
 
 from collective.portlet.slideshow import PloneMessageFactory as _
 
+from Products.CMFCore.utils import getToolByName
 
 class ISlideshowPortlet(IPortletDataProvider):
     """A portlet which renders the results of a collection object.
@@ -188,6 +189,16 @@ class Renderer(base.Renderer):
             if not sm.checkPermission('View', result):
                 result = None
         return result
+
+    def getImageObject(self, item):
+        if item.portal_type == "Image":
+            return item.getObject()
+        if item.hasMedia and item.leadMedia != None:
+            catalog = getToolByName(self.context, 'portal_catalog')
+            media_brains = catalog.queryCatalog({"UID": item.leadMedia})
+            media = media_brains[0]
+            media_object = media.getObject()
+            return media_object
 
 
 class AddForm(base.AddForm):

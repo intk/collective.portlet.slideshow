@@ -3,9 +3,12 @@
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:plone="http://namespaces.plone.org/plone"
-    i18n_domain="plone">
+    i18n_domain="collective.portlet.slideshow">
 
-    <five:registerPackage package="." />
+    <five:registerPackage
+        package="."
+        initialize=".initialize"
+        />
 
     <genericsetup:registerProfile
        name="default"
@@ -15,18 +18,13 @@
        provides="Products.GenericSetup.interfaces.EXTENSION"
        />
 
-     <permission
-       id="collective.portlet.slideshow.AddSlideshowPortlet"
-       title="collective.portlet.slideshow: Add slideshow portlet"
-       />
-
      <!-- Register the portlet -->
      <plone:portlet
          name="collective.portlet.slideshow.Slideshow"
          interface=".slideshow.ISlideshowPortlet"
          assignment=".slideshow.Assignment"
          view_permission="zope2.View"
-         edit_permission="collective.portlet.slideshow.AddSlideshowPortlet"
+         edit_permission="plone.app.portlets.ManagePortlets"
          renderer=".slideshow.Renderer"
          addview=".slideshow.AddForm"
          editview=".slideshow.EditForm"
