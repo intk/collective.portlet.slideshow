@@ -22,6 +22,7 @@ from plone.i18n.normalizer.interfaces import IIDNormalizer
 from collective.portlet.slideshow import PloneMessageFactory as _
 
 from Products.CMFCore.utils import getToolByName
+from plone.dexterity.browser.view import DefaultView
 
 class ISlideshowPortlet(IPortletDataProvider):
     """A portlet which renders the results of a collection object.
@@ -102,7 +103,7 @@ class Assignment(base.Assignment):
         return self.header
 
 
-class Renderer(base.Renderer):
+class Renderer(base.Renderer, DefaultView):
 
     _template = ViewPageTemplateFile('slideshow.pt')
     render = _template

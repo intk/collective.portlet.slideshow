@@ -25,6 +25,9 @@
                         <div class="inner-bg" tal:condition="scale">
                             <img tal:replace="structure python: scale.tag(css_class='tileImage', alt='', title='')"/>
                         </div>
+
+                        
+
                     </div>
                 </tal:events>
                 <!-- Slideshow content -->
@@ -44,4 +47,20 @@
             </div>
         </div> <!-- Slideshow Wrapper -->
     </div> 
+
+   <div class="object-fields" style="height: auto;" tal:define="first_item python:view.results()[0]">
+        <div id="parent-fieldname-text">
+            <div id="body-text">
+                <p tal:condition="first_item/text" tal:content="structure python:first_item.text.output_relative_to(context.view)" ></p>
+            </div>
+        
+        <div class="container object-container" style="display:block;">
+            <div class="object-fieldset">
+                
+            </div>
+        </div>   
+        </div> 
+   </div>
+
+
 </div>
