@@ -18,6 +18,7 @@
                                     item_description python: item_obj.Description();">
                         <tal:isobject tal:condition="python: item_type == 'Object'">
                             <div tal:define="item_img python:view.getImageObject(obj);
+                                item_text python: getattr(item_obj, 'text', '');
                                 item_url python: item_obj.absolute_url();
                                 images item_img/@@images;
                                 scale python: images.scale('image', scale='large')"
