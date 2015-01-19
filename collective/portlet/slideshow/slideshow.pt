@@ -16,7 +16,6 @@
                                     item_type obj/Type;
                                     item_title python: item_obj.Title();
                                     item_description python: item_obj.Description();">
-                        
                         <tal:isobject tal:condition="python: item_type == 'Object'">
                             <div tal:define="item_img python:view.getImageObject(obj);
                                 item_text python: item_obj.text.output;
