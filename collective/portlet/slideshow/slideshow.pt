@@ -11,25 +11,35 @@
             <div class="slick-slideshow collection">
                 <!-- Slideshow content -->
                 <tal:events tal:repeat="obj view/results">
-                    <div 
-                        tal:define="item_img python:view.getImageObject(obj);
-                        item_obj obj/getObject;
-                        item_title python: item_obj.Title();
-                        item_description python: item_obj.Description();
-                        item_text python: item_obj.text.output;
-                        item_url python: item_obj.absolute_url();
-                        images item_img/@@images;
-                        scale python: images.scale('image', scale='large')"
-
-                        tal:attributes="data-body python: item_text; data-title python: item_title; data-description python: item_description; data-url python: item_url;">
+                    <tal:definitions 
+                        tal:define="item_obj obj/getObject;
+                                    item_type obj/Type;
+                                    item_title python: item_obj.Title();
+                                    item_description python: item_obj.Description();">
                         
-                        <div class="inner-bg" tal:condition="scale">
-                            <img tal:replace="structure python: scale.tag(css_class='tileImage', alt='', title='')"/>
-                        </div>
+                        <tal:isobject tal:condition="python: item_type == 'Object'">
+                            <div tal:define="item_img python:view.getImageObject(obj);
+                                item_text python: item_obj.text.output;
+                                item_url python: item_obj.absolute_url();
+                                images item_img/@@images;
+                                scale python: images.scale('image', scale='large')"
 
-                        
+                                tal:attributes="data-body python: item_text; data-title python: item_title; data-description python: item_description; data-url python: item_url;">
+                                
+                                    <div class="inner-bg" tal:condition="scale">
+                                        <img tal:replace="structure python: scale.tag(css_class='tileImage', alt='', title='')"/>
+                                    </div>
+                            </div>
+                        </tal:isobject>
 
-                    </div>
+                        <tal:islink tal:condition="python: item_type == 'Link'">
+                            <div tal:define="item_url python: item_obj.absolute_url();"
+
+                                tal:attributes="data-title python: item_title; data-description python: item_description; data-url python: item_url;" class="video-slide">
+                                    <iframe frameborder="0" allowfullscreen tal:attributes="id obj/getId; src python:item_obj.remoteUrl+'?enablejsapi=1&wmode=transparent&rel=0&showinfo=0&autohide=1&controls=0'"></iframe>
+                            </div>
+                        </tal:islink>
+                    </tal:definitions>
                 </tal:events>
                 <!-- Slideshow content -->
             </div> <!-- Slideshow inside -->
@@ -50,17 +60,17 @@
     </div> 
 
    <div class="object-fields" style="height: auto;" tal:define="first_item python:view.results()[0]">
-        <div id="parent-fieldname-text">
-            <div id="body-text">
-                <p tal:condition="first_item/text" tal:content="structure python:first_item.text.output_relative_to(context.view)" ></p>
-            </div>
-        
-        <div class="container object-container" style="display:block;">
-            <div class="object-fieldset">
-
-            </div>
-        </div>   
-        </div> 
+        <tal:objectfirst tal:condition="python: first_item.portal_type == 'Object'">
+            <div id="parent-fieldname-text">
+                <div id="body-text">
+                    <p tal:condition="first_item/text" tal:content="structure python:first_item.text.output_relative_to(context.view)" ></p>
+                </div>
+            
+                <div class="container object-container" style="display:block;">
+                    <div class="object-fieldset"></div>
+                </div>   
+            </div> 
+        </tal:objectfirst>
    </div>
 
 
