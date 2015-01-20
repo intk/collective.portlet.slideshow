@@ -15,15 +15,17 @@
                         tal:define="item_obj obj/getObject;
                                     item_type obj/Type;
                                     item_title python: item_obj.Title();
-                                    item_description python: item_obj.Description();">
+                                    item_description python: item_obj.Description();
+                                    first repeat/obj/start">
                         <tal:isobject tal:condition="python: item_type == 'Object'">
                             <div tal:define="item_img python:view.getImageObject(obj);
                                 item_text python: getattr(item_obj, 'text', '');
+                                item_text_output python: getattr(item_text, 'output', '');
                                 item_url python: item_obj.absolute_url();
                                 images item_img/@@images;
                                 scale python: images.scale('image', scale='large')"
 
-                                tal:attributes="data-body python: item_text; data-title python: item_title; data-description python: item_description; data-url python: item_url;">
+                                tal:attributes="data-body python: item_text_output; data-title python: item_title; data-description python: item_description; data-url python: item_url;">
                                 
                                     <div class="inner-bg" tal:condition="scale">
                                         <img tal:replace="structure python: scale.tag(css_class='tileImage', alt='', title='')"/>
@@ -32,9 +34,14 @@
                         </tal:isobject>
 
                         <tal:islink tal:condition="python: item_type == 'Link'">
-                            <div tal:define="item_url python: item_obj.absolute_url();"
-
+                            <div tal:define="item_url python: item_obj.absolute_url();
+                                            item_img python:view.getImageObject(obj);"
                                 tal:attributes="data-title python: item_title; data-description python: item_description; data-url python: item_url;" class="video-slide">
+
+                                    <div class='inner-bg' tal:condition="first">
+                                        <img tal:define="images item_img/@@images; scale python: images.scale('image', scale='large');" tal:replace="structure python: scale.tag(css_class='overlay-image', alt='', title='')" tal:condition="python: item_img != None"/>
+                                    </div>
+                                
                                     <iframe frameborder="0" allowfullscreen tal:attributes="id obj/getId; src python:item_obj.remoteUrl+'?enablejsapi=1&wmode=transparent&rel=0&showinfo=0&autohide=1&controls=0'"></iframe>
                             </div>
                         </tal:islink>
