@@ -60,6 +60,26 @@
                     <a type="button" class="btn btn-default play-btn playing"><i class="fa fa-pause"></i></a>
                     <a type="button" class="btn btn-default expand-btn"><i class="fa fa-compress"></i></a>
                     <a type="button" class="btn btn-default info-btn visible-xs"><i class="fa fa-info-circle"></i></a>
+                    <a type="button" class="btn btn-default share-btn" data-toggle="popover" data-placement="top"><i class="fa fa-share-alt"></i></a>
+                    
+                    <div id="share-title" style="display:none">
+                        Deze pagina delen
+                    </div>
+
+                    <div id="share-settings" style="display:none">
+                        <div class="row">
+                                <div id="fb-root"></div>
+                                <img rel="image_src" style="display:none;"/>
+                                <div class="fb-share-button" tal:attributes="data-href python: context.absolute_url()" data-layout="button_count"></div>
+                        </div>
+                        <div class="row">
+                            <a href="https://twitter.com/share" class="twitter-share-button" data-via="andreesg">Tweet</a>
+                        </div>
+                        <div class="row">
+                            <a id="pinterest-btn" href="//www.pinterest.com/pin/create/button/?url=" data-pin-do="buttonPin" data-pin-config="none"><img src="//assets.pinterest.com/images/pidgets/pinit_fg_en_rect_gray_20.png"/>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div> <!-- Slideshow Wrapper -->
