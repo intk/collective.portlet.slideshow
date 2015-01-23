@@ -40,11 +40,15 @@
 
                                     <tal:firstslide tal:condition="first">
                                         <img tal:define="images item_img/@@images; scale python: images.scale('image', scale='large');" tal:replace="structure python: scale.tag(css_class='overlay-image', alt='', title='')" tal:condition="python: item_img != None"/>
+                                        <iframe frameborder="0" allowfullscreen tal:attributes="id obj/getId; src python:item_obj.remoteUrl+'?enablejsapi=1&wmode=transparent&rel=0&showinfo=0&autohide=1&controls=0'" class="first-iframe"></iframe>
                                     </tal:firstslide>
-                                
-                                    <iframe frameborder="0" allowfullscreen tal:attributes="id obj/getId; src python:item_obj.remoteUrl+'?enablejsapi=1&wmode=transparent&rel=0&showinfo=0&autohide=1&controls=0'"></iframe>
+
+                                    <tal:notfirstslide tal:condition="not:first">
+                                        <iframe frameborder="0" allowfullscreen tal:attributes="id obj/getId; src python:item_obj.remoteUrl+'?enablejsapi=1&wmode=transparent&rel=0&showinfo=0&autohide=1&controls=0'"></iframe>
+                                    </tal:notfirstslide tal:condition="not:first">
                             </div>
                         </tal:islink>
+
                     </tal:definitions>
                 </tal:events>
                 <!-- Slideshow content -->
