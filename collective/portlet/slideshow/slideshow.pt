@@ -17,7 +17,8 @@
                                     item_title python: item_obj.Title();
                                     item_description python: item_obj.Description();
                                     first repeat/obj/start">
-                        <tal:isobject tal:condition="python: item_type == 'Object'">
+                        
+                        <tal:isobject tal:condition="python: item_type == 'Object' or item_type =='Event'">
                             <div tal:define="item_img python:view.getImageObject(obj);
                                 item_text python: getattr(item_obj, 'text', '');
                                 item_text_output python: getattr(item_text, 'output', '');
