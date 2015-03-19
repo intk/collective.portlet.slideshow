@@ -6,7 +6,7 @@
                 viewActions here/portal_properties/site_properties/typesUseViewActionInListings|python:();"
     tal:attributes="class string:portlet portletSlideshow ${view/css_class}">
 
-    <div class="slideshow" id="slickslideshow">
+    <div class="slideshow" id="slickslideshow" tal:attributes="data-url collection_url">
         <div class="slideshowWrapper">
             <div class="slick-slideshow collection">
                 <!-- Slideshow content -->

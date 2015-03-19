@@ -139,6 +139,7 @@ class Renderer(base.Renderer, DefaultView):
         collection = self.collection()
         if collection is not None:
             limit = self.data.limit
+            #limit = 1
             if limit and limit > 0:
                 # pass on batching hints to the catalog
                 results = collection.queryCatalog(batch=True, b_size=limit)
