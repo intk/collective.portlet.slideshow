@@ -18,20 +18,22 @@
                                     item_description python: item_obj.Description();
                                     first repeat/obj/start">
                         
-                        <tal:isobject tal:condition="python: item_type == 'Object' or item_type =='Event'">
-                            <div tal:define="item_img python:view.getImageObject(obj);
-                                item_text python: getattr(item_obj, 'text', '');
-                                item_text_output python: getattr(item_text, 'output', '');
-                                item_url python: item_obj.absolute_url();
-                                images item_img/@@images;
-                                scale python: images.scale('image', scale='large')"
+                        <tal:isobject tal:condition="python: item_type == 'Object' or item_type =='Event'"
+                            tal:define="item_img python:view.getImageObject(obj);">
+                            <tal:hasimage tal:condition="python: item_img != None">
+                                <div tal:define="item_text python: getattr(item_obj, 'text', '');
+                                    item_text_output python: getattr(item_text, 'output', '');
+                                    item_url python: item_obj.absolute_url();
+                                    images item_img/@@images;
+                                    scale python: images.scale('image', scale='large')"
 
-                                tal:attributes="data-body python: item_text_output; data-title python: item_title; data-description python: item_description; data-url python: item_url;">
-                                
-                                    <div class="inner-bg" tal:condition="scale">
-                                        <img tal:replace="structure python: scale.tag(css_class='tileImage', alt='', title='')"/>
-                                    </div>
-                            </div>
+                                    tal:attributes="data-body python: item_text_output; data-title python: item_title; data-description python: item_description; data-url python: item_url;">
+                                    
+                                        <div class="inner-bg" tal:condition="scale">
+                                            <img tal:replace="structure python: scale.tag(css_class='tileImage', alt='', title='')"/>
+                                        </div>
+                                </div>
+                            </tal:hasimage>
                         </tal:isobject>
 
                         <tal:islink tal:condition="python: item_type == 'Link'">
