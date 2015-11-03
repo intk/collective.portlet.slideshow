@@ -23,6 +23,7 @@ from collective.portlet.slideshow import PloneMessageFactory as _
 
 from Products.CMFCore.utils import getToolByName
 from plone.dexterity.browser.view import DefaultView
+from plone.app.uuid.utils import uuidToCatalogBrain, uuidToObject
 
 class ISlideshowPortlet(IPortletDataProvider):
     """A portlet which renders the results of a collection object.
@@ -195,11 +196,8 @@ class Renderer(base.Renderer, DefaultView):
     def getImageObject(self, item):
         if item.portal_type == "Image":
             return item.getObject()
-        if item.hasMedia and item.leadMedia != None:
-            catalog = getToolByName(self.context, 'portal_catalog')
-            media_brains = catalog.queryCatalog({"UID": item.leadMedia})
-            media = media_brains[0]
-            media_object = media.getObject()
+        if item.leadMedia != None:
+            media_object = uuidToObject(item.leadMedia)
             return media_object
 
 
