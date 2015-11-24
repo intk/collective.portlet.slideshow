@@ -39,7 +39,7 @@
 
                         <tal:islink tal:condition="python: item_type == 'Link'">
 
-                            <div tal:define="item_url obj/getUrl;
+                            <div tal:define="item_url obj/getURL;
                                             remoteURL obj_brain/getRemoteUrl;
                                             item_img python:view.getImageObject(obj);"
                                 tal:attributes="data-title python: item_title; data-description python: item_description; data-url python: item_url;" class="video-slide">
