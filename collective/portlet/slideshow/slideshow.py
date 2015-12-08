@@ -20,7 +20,6 @@ from plone.app.form.widgets.uberselectionwidget import UberSelectionWidget
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 
 from collective.portlet.slideshow import PloneMessageFactory as _
-
 from Products.CMFCore.utils import getToolByName
 from plone.dexterity.browser.view import DefaultView
 from plone.app.uuid.utils import uuidToCatalogBrain, uuidToObject

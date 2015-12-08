@@ -30,7 +30,7 @@
                                         <div class="inner-bg">
                                            <img
                                                  src="" alt=""
-                                                 tal:attributes="src item_img; class python:'tileImage'; alt item_title; title item_title;" /> 
+                                                 tal:attributes="src item_img; class python:'tileImage overlay-image'; alt item_title; title item_title;" /> 
                                         </div>
                                 </div>
 
@@ -50,7 +50,7 @@
 
                                             <img
                                                  src="" alt=""
-                                                 tal:attributes="src item_img; class python:'tileImage'; alt item_title; title item_title;" />
+                                                 tal:attributes="src item_img; class python:'tileImage overlay-image'; alt item_title; title item_title;" />
                                             
                                             <iframe frameborder="0" allowfullscreen tal:attributes="id obj_id; src remoteURL" class="video-iframe with-overlay"></iframe>
                                         </tal:usepicture>
