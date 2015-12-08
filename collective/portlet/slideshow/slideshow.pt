@@ -27,7 +27,7 @@
                                 <div tal:define="item_url obj/getURL;"
                                     tal:attributes="data-title python: item_title; data-description python: item_description; data-url python: item_url;">
                                     
-                                        <div class="inner-bg" tal:condition="scale">
+                                        <div class="inner-bg">
                                            <img
                                                  src="" alt=""
                                                  tal:attributes="src item_img; class python:'tileImage'; alt item_title; title item_title;" /> 
