@@ -199,7 +199,7 @@ class Renderer(base.Renderer, DefaultView):
         if item.leadMedia != None:
             media_object = uuidToCatalogBrain(item.leadMedia)
             if media_object:
-                return media_object.getURL()+"/@@images/image/mini"
+                return media_object.getURL()+"/@@images/image/large"
             else:
                 return None
         return None
