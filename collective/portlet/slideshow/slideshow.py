@@ -197,8 +197,12 @@ class Renderer(base.Renderer, DefaultView):
         if item.portal_type == "Image":
             return item.getObject()
         if item.leadMedia != None:
-            media_object = uuidToObject(item.leadMedia)
-            return media_object
+            media_object = uuidToCatalogBrain(item.leadMedia)
+            if media_object:
+                return media_object.getURL()+"/@@images/image/mini"
+            else:
+                return None
+        return None
 
 
 class AddForm(base.AddForm):
