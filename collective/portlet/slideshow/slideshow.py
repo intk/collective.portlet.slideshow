@@ -1,28 +1,33 @@
+from ComputedAttribute import ComputedAttribute
+from plone.app.portlets.browser import formhelper
+from plone.app.portlets.portlets import base
+from plone.app.uuid.utils import uuidToObject, uuidToCatalogBrain
+from plone.app.vocabularies.catalog import CatalogSource
+from plone.i18n.normalizer.interfaces import IIDNormalizer
+from plone.memoize.instance import memoize
+from plone.portlet.collection import PloneMessageFactory as _
+from plone.portlets.interfaces import IPortletDataProvider
+from Products.CMFCore.utils import getToolByName
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from zExceptions import NotFound
+from zope import schema
+from zope.component import getUtility
+from zope.interface import implements
 import random
 
-from AccessControl import getSecurityManager
+COLLECTIONS = []
 
-from zope.interface import implements
-from zope.component import getMultiAdapter, getUtility
+try:
+    from plone.app.collection.interfaces import ICollection
+    COLLECTIONS.append(ICollection.__identifier__)
+except ImportError:
+    pass
 
-from plone.portlets.interfaces import IPortletDataProvider
-from plone.app.portlets.portlets import base
-
-from zope import schema
-from zope.formlib import form
-
-from plone.memoize.instance import memoize
-
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from plone.app.vocabularies.catalog import SearchableTextSourceBinder
-from plone.app.form.widgets.uberselectionwidget import UberSelectionWidget
-
-from plone.i18n.normalizer.interfaces import IIDNormalizer
-
-from collective.portlet.slideshow import PloneMessageFactory as _
-from Products.CMFCore.utils import getToolByName
-from plone.dexterity.browser.view import DefaultView
-from plone.app.uuid.utils import uuidToCatalogBrain, uuidToObject
+try:
+    from plone.app.contenttypes.interfaces import ICollection
+    COLLECTIONS.append(ICollection.__identifier__)
+except ImportError:
+    pass
 
 class ISlideshowPortlet(IPortletDataProvider):
     """A portlet which renders the results of a collection object.
@@ -33,13 +38,12 @@ class ISlideshowPortlet(IPortletDataProvider):
         description=_(u"Title of the rendered portlet"),
         required=True)
 
-    target_collection = schema.Choice(
+    uid = schema.Choice(
         title=_(u"Target collection"),
         description=_(u"Find the collection which provides the items to list"),
         required=True,
-        source=SearchableTextSourceBinder(
-            {'portal_type': ('Topic', 'Collection')},
-            default_query='path:'))
+        source=CatalogSource(portal_type=('Topic', 'Collection')),
+        )
 
     limit = schema.Int(
         title=_(u"Limit"),
@@ -69,6 +73,14 @@ class ISlideshowPortlet(IPortletDataProvider):
         required=True,
         default=False)
 
+    exclude_context = schema.Bool(
+        title=_(u"Exclude the Current Context"),
+        description=_(
+            u"If enabled, the listing will not include the current item the "
+            u"portlet is rendered for if it otherwise would be."),
+        required=True,
+        default=True)
+
 
 class Assignment(base.Assignment):
     """
@@ -77,23 +89,28 @@ class Assignment(base.Assignment):
     with columns.
     """
 
-    implements(ISlideshowPortlet)
+    implements(ICollectionPortlet)
 
     header = u""
-    target_collection = None
     limit = None
     random = False
     show_more = True
     show_dates = False
+    exclude_context = False
 
-    def __init__(self, header=u"", target_collection=None, limit=None,
-                 random=False, show_more=True, show_dates=False):
+    # bbb
+    target_collection = None
+
+    def __init__(self, header=u"", uid=None, limit=None,
+                 random=False, show_more=True, show_dates=False,
+                 exclude_context=True):
         self.header = header
-        self.target_collection = target_collection
+        self.uid = uid
         self.limit = limit
         self.random = random
         self.show_more = show_more
         self.show_dates = show_dates
+        self.exclude_context = exclude_context
 
     @property
     def title(self):
@@ -101,6 +118,19 @@ class Assignment(base.Assignment):
         "manage portlets" screen. Here, we use the title that the user gave.
         """
         return self.header
+
+    def _uid(self):
+        # This is only called if the instance doesn't have a uid
+        # attribute, which is probably because it has an old
+        # 'target_collection' attribute that needs to be converted.
+        path = self.target_collection
+        portal = getToolByName(self, 'portal_url').getPortalObject()
+        try:
+            collection = portal.unrestrictedTraverse(path.lstrip('/'))
+        except (AttributeError, KeyError, TypeError, NotFound):
+            return
+        return collection.UID()
+    uid = ComputedAttribute(_uid, 1)
 
 
 class Renderer(base.Renderer, DefaultView):
@@ -138,14 +168,20 @@ class Renderer(base.Renderer, DefaultView):
         results = []
         collection = self.collection()
         if collection is not None:
+            context_path = '/'.join(self.context.getPhysicalPath())
+            exclude_context = getattr(self.data, 'exclude_context', False)
             limit = self.data.limit
-            #limit = 1
             if limit and limit > 0:
                 # pass on batching hints to the catalog
-                results = collection.queryCatalog(batch=True, b_size=limit)
+                results = collection.queryCatalog(
+                    batch=True, b_size=limit  + exclude_context)
                 results = results._sequence
             else:
                 results = collection.queryCatalog()
+            if exclude_context:
+                results = [
+                    brain for brain in results
+                    if brain.getPath() != context_path]
             if limit and limit > 0:
                 results = results[:limit]
         return results
@@ -155,11 +191,17 @@ class Renderer(base.Renderer, DefaultView):
         results = []
         collection = self.collection()
         if collection is not None:
-            results = collection.queryCatalog(sort_on=None, batch=False)
+            context_path = '/'.join(self.context.getPhysicalPath())
+            exclude_context = getattr(self.data, 'exclude_context', False)
+            results = collection.queryCatalog(sort_on=None)
             if results is None:
                 return []
             limit = self.data.limit and min(len(results), self.data.limit) or 1
 
+            if exclude_context:
+                results = [
+                    brain for brain in results
+                    if brain.getPath() != context_path]
             if len(results) < limit:
                 limit = len(results)
             results = random.sample(results, limit)
@@ -168,29 +210,16 @@ class Renderer(base.Renderer, DefaultView):
 
     @memoize
     def collection(self):
-        collection_path = self.data.target_collection
-        if not collection_path:
-            return None
+        return uuidToObject(self.data.uid)
 
-        if collection_path.startswith('/'):
-            collection_path = collection_path[1:]
-
-        if not collection_path:
-            return None
-
-        portal_state = getMultiAdapter((self.context, self.request),
-                                       name=u'plone_portal_state')
-        portal = portal_state.portal()
-        if isinstance(collection_path, unicode):
-            # restrictedTraverse accepts only strings
-            collection_path = str(collection_path)
-
-        result = portal.unrestrictedTraverse(collection_path, default=None)
-        if result is not None:
-            sm = getSecurityManager()
-            if not sm.checkPermission('View', result):
-                result = None
-        return result
+    def include_empty_footer(self):
+        """
+        Whether or not to include an empty footer element when the more
+        link is turned off.
+        Always returns True (this method provides a hook for
+        sub-classes to override the default behaviour).
+        """
+        return True
 
     def getImageObject(self, item):
         if item.portal_type == "Image":
@@ -206,22 +235,17 @@ class Renderer(base.Renderer, DefaultView):
 
 class AddForm(base.AddForm):
 
-    form_fields = form.Fields(ISlideshowPortlet)
-    form_fields['target_collection'].custom_widget = UberSelectionWidget
-
+    schema = ICollectionPortlet
     label = _(u"Add Slideshow Portlet")
-    description = _(u"This portlet displays a "
-                    u"Slideshow.")
+    description = _(u"This portlet displays a slideshow with items from a "
+                    u"Collection.")
 
     def create(self, data):
         return Assignment(**data)
 
 
 class EditForm(base.EditForm):
-
-    form_fields = form.Fields(ISlideshowPortlet)
-    form_fields['target_collection'].custom_widget = UberSelectionWidget
-
-    label = _(u"Edit Slideshow Portlet")
-    description = _(u"This portlet displays a "
-                    u"Slideshow.")
+    schema = ICollectionPortlet
+    label = _(u"Edit Collection Portlet")
+    description = _(u"This portlet displays a slideshow with items from a "
+                    u"Collection.")
