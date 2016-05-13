@@ -133,7 +133,7 @@ class Assignment(base.Assignment):
     uid = ComputedAttribute(_uid, 1)
 
 
-class Renderer(base.Renderer, DefaultView):
+class Renderer(base.Renderer):
 
     _template = ViewPageTemplateFile('slideshow.pt')
     render = _template
