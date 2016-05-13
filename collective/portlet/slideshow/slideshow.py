@@ -89,7 +89,7 @@ class Assignment(base.Assignment):
     with columns.
     """
 
-    implements(ICollectionPortlet)
+    implements(ISlideshowPortlet)
 
     header = u""
     limit = None
@@ -235,7 +235,7 @@ class Renderer(base.Renderer, DefaultView):
 
 class AddForm(base.AddForm):
 
-    schema = ICollectionPortlet
+    schema = ISlideshowPortlet
     label = _(u"Add Slideshow Portlet")
     description = _(u"This portlet displays a slideshow with items from a "
                     u"Collection.")
@@ -245,7 +245,7 @@ class AddForm(base.AddForm):
 
 
 class EditForm(base.EditForm):
-    schema = ICollectionPortlet
+    schema = ISlideshowPortlet
     label = _(u"Edit Collection Portlet")
     description = _(u"This portlet displays a slideshow with items from a "
                     u"Collection.")

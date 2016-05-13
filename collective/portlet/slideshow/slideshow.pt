@@ -9,7 +9,6 @@
     <div class="slideshow" id="slickslideshow" tal:attributes="data-url collection_url">
         <div class="slideshowWrapper">
             <div class="slick-slideshow collection">
-
                 <tal:events tal:repeat="obj view/results">
                     <tal:definitions 
                         tal:define="item_type obj/Type;
@@ -65,7 +64,6 @@
 
                     </tal:definitions>
                 </tal:events>
-
             </div> 
         </div> 
     </div> 
