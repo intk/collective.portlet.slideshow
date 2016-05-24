@@ -11,14 +11,14 @@
             <div class="slick-slideshow collection">
                 <tal:events tal:repeat="obj view/results">
                     <tal:definitions 
-                        tal:define="item_type obj/Type;
+                        tal:define="item_type obj/portal_type;
                                     obj_id obj/getId;
                                     obj_brain obj/_brain;
                                     item_title obj/Title;
                                     item_description obj/Description;
                                     first repeat/obj/start">
                         
-                        <tal:isobject tal:condition="python: item_type in ['Object', 'Event', 'Exhibition']"
+                        <tal:isobject tal:condition="python: item_type in ['Object', 'Event', 'Exhibition', 'Document']"
                             tal:define="item_img python:view.getImageObject(obj);">
                             
                             <tal:hasimage tal:condition="python: item_img != None">
@@ -29,7 +29,7 @@
                                         <div class="inner-bg">
                                            <img
                                                  src="" alt=""
-                                                 tal:attributes="src item_img; class python:'tileImage overlay-image'; alt item_title; title item_title;" /> 
+                                                 tal:attributes="src item_img; class python:'tileImage'; alt item_title; title item_title;" /> 
                                         </div>
                                 </div>
 
