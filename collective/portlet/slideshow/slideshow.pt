@@ -18,7 +18,7 @@
                                     item_description obj/Description;
                                     first repeat/obj/start">
                         
-                        <tal:isobject tal:condition="python: item_type in ['Object', 'Event', 'Exhibition', 'Document']"
+                        <tal:isobject tal:condition="python: item_type in ['Object', 'Event', 'Exhibition', 'Document', 'Image']"
                             tal:define="item_img python:view.getImageObject(obj);">
                             
                             <tal:hasimage tal:condition="python: item_img != None">

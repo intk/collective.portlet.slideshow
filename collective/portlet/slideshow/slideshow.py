@@ -223,7 +223,10 @@ class Renderer(base.Renderer):
 
     def getImageObject(self, item):
         if item.portal_type == "Image":
-            return item.getObject()
+            try:
+                return item.getURL()+"/@@images/image/large"
+            except:
+                return None
         if item.leadMedia != None:
             media_object = uuidToCatalogBrain(item.leadMedia)
             if media_object:
