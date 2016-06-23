@@ -29,7 +29,7 @@
                                         <div class="inner-bg">
                                            <img
                                                  src="" alt=""
-                                                 tal:attributes="src item_img; class python:'tileImage'; alt item_title; title item_title;" /> 
+                                                 tal:attributes="src item_img; class python:'tileImage';" /> 
                                         </div>
                                 </div>
 
@@ -49,7 +49,7 @@
 
                                             <img
                                                  src="" alt=""
-                                                 tal:attributes="src item_img; class python:'tileImage overlay-image'; alt item_title; title item_title;" />
+                                                 tal:attributes="src item_img; class python:'tileImage overlay-image';" />
                                             
                                             <iframe frameborder="0" allowfullscreen tal:attributes="id obj_id; src remoteURL" class="video-iframe with-overlay"></iframe>
                                         </tal:usepicture>
@@ -62,6 +62,28 @@
                             </div>
                         </tal:islink>
 
+                        <tal:isstreetview tal:condition="python: item_type == 'StreetView'">
+
+                            <tal:streetview_settings tal:define="streetview_settings python:view.getStreetViewOptions(obj)"
+                                >
+                                    <div id="street-view" class="street-view" 
+                                        tal:condition="streetview_settings"
+                                        tal:attributes="data-lat python:streetview_settings.get('lat', '');
+                                                                             data-lng python:streetview_settings.get('lng', '');
+                                                                             data-heading python:streetview_settings.get('heading', '');
+                                                                             data-pitch python:streetview_settings.get('pitch', '');
+                                                                             data-zoom python:streetview_settings.get('zoom', '');
+                                                                             data-addressControl python:streetview_settings.get('addressControl', '');
+                                                                             data-zoomControl python:streetview_settings.get('zoomControl', '');
+                                                                             data-linksControl python:streetview_settings.get('linksControl', '');
+                                                                             data-panControl python:streetview_settings.get('panControl', '');
+                                                                             data-enableCloseButton python:streetview_settings.get('enableCloseButton', '');
+                                                                             data-fullscreenControl python:streetview_settings.get('fullscreenControl', '');
+                                                                             "
+                                                                             >
+                                    </div>
+                            </tal:streetview_settings>
+                        </tal:isstreetview>
                     </tal:definitions>
                 </tal:events>
             </div> 

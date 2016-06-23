@@ -14,6 +14,7 @@ from zope import schema
 from zope.component import getUtility
 from zope.interface import implements
 import random
+import json
 
 COLLECTIONS = []
 
@@ -139,6 +140,7 @@ class Renderer(base.Renderer):
     render = _template
 
     def __init__(self, *args):
+        print "render"
         base.Renderer.__init__(self, *args)
 
     @property
@@ -234,6 +236,21 @@ class Renderer(base.Renderer):
             else:
                 return None
         return None
+
+    def getStreetViewOptions(self, item):
+
+        if item.portal_type == "StreetView":
+            obj = item.getObject()
+            streetview_options = getattr(obj, 'streetview_settings', None)
+            if streetview_options:
+                streetview_options_dict = json.loads(streetview_options)
+                return streetview_options_dict[0]
+            else:
+                return None
+
+        else:
+            return None
+
 
 
 class AddForm(base.AddForm):
