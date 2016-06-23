@@ -15,6 +15,8 @@ from zope.component import getUtility
 from zope.interface import implements
 import random
 import json
+import os
+import pkg_resources
 
 COLLECTIONS = []
 
@@ -25,10 +27,12 @@ except ImportError:
     pass
 
 try:
-    from plone.app.contenttypes.interfaces import ICollection
-    COLLECTIONS.append(ICollection.__identifier__)
-except ImportError:
-    pass
+    pkg_resources.get_distribution('plone.app.relationfield')
+except pkg_resources.DistributionNotFound:
+    HAS_RELATIONFIELD = False
+else:
+    from plone.app.relationfield.behavior import IRelatedItems
+    HAS_RELATIONFIELD = True
 
 class ISlideshowPortlet(IPortletDataProvider):
     """A portlet which renders the results of a collection object.
@@ -140,7 +144,6 @@ class Renderer(base.Renderer):
     render = _template
 
     def __init__(self, *args):
-        print "render"
         base.Renderer.__init__(self, *args)
 
     @property
@@ -223,33 +226,84 @@ class Renderer(base.Renderer):
         """
         return True
 
-    def getImageObject(self, item):
+    def getLeadMediaURL(self, item, scale="large"):
         if item.portal_type == "Image":
-            try:
-                return item.getURL()+"/@@images/image/large"
-            except:
+            url = item.getURL()
+            if url:
+                return "%s/@@images/image/%s" %(item.getURL(), scale)
+            else:
                 return None
         if item.leadMedia != None:
             media_object = uuidToCatalogBrain(item.leadMedia)
             if media_object:
-                return media_object.getURL()+"/@@images/image/large"
+                return "%s/@@images/image/%s" %(media_object.getURL(), scale)
             else:
                 return None
         return None
 
     def getStreetViewOptions(self, item):
-
         if item.portal_type == "StreetView":
             obj = item.getObject()
             streetview_options = getattr(obj, 'streetview_settings', None)
             if streetview_options:
                 streetview_options_dict = json.loads(streetview_options)
-                return streetview_options_dict[0]
+                if streetview_options_dict:
+                    return streetview_options_dict[0]
+                else:
+                    return None
             else:
                 return None
-
         else:
             return None
+
+    def getAudioURL(self, item):
+        if item:
+            ext = ''
+            url = item.getURL()
+            filename = item.getFilename()
+            if filename:
+                extension = os.path.splitext(filename)[1]
+                if not url.endswith(extension):
+                    ext = "?e=%s" % extension
+            return url + ext
+        else:
+            return ""
+
+    def getAudioFile(self, item):
+        related_items = self.getRelatedItems(item)
+        if len(related_items):
+            audio_file = related_items[0]
+            if audio_file.portal_type == "File":
+                return audio_file
+            else:
+                return None
+        else:
+            return None
+        return None
+
+    def getRelatedItems(self, item):
+        if HAS_RELATIONFIELD and IRelatedItems.providedBy(item):
+            related = item.relatedItems
+            if not related:
+                return ()
+            res = self.related2brains(related)
+        return res
+
+    def related2brains(self, related):
+        """Return a list of brains based on a list of relations. Will filter
+        relations if the user has no permission to access the content.
+        :param related: related items
+        :type related: list of relations
+        :return: list of catalog brains
+        """
+        catalog = getToolByName(self.context, 'portal_catalog')
+        brains = []
+        for r in related:
+            path = r.to_path
+            # the query will return an empty list if the user
+            # has no permission to see the target object
+            brains.extend(catalog(path=dict(query=path, depth=0)))
+        return brains
 
 
 
