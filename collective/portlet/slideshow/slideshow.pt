@@ -13,7 +13,6 @@
                     <tal:definitions 
                         tal:define="item_type obj/portal_type;
                                     obj_id obj/getId;
-                                    real_obj python:obj.getObject();
                                     obj_brain obj/_brain;
                                     item_title obj/Title;
                                     item_description obj/Description;
@@ -33,7 +32,7 @@
                                                  tal:attributes="src item_img; class python:'tileImage';" /> 
                                         </div>
 
-                                        <tal:containsaudio tal:define="audio_file python: view.getAudioFile(real_obj)">
+                                        <tal:containsaudio tal:define="audio_file python: view.getAudioFile(obj.getObject())">
                                             <div tal:condition="python: audio_file != None"
                                                 tal:define="audio_url python: view.getAudioURL(audio_file);
                                                             audio_contenttype python: 'audio/mp3'">
@@ -102,7 +101,7 @@
                                                      "
                                                      >
                                     </div>
-                                    <tal:containsaudio tal:define="audio_file python: view.getAudioFile(real_obj)">
+                                    <tal:containsaudio tal:define="audio_file python: view.getAudioFile(obj.getObject())">
                                         <div tal:condition="python: audio_file != None"
                                             tal:define="audio_url python: view.getAudioURL(audio_file);
                                                         audio_contenttype python: 'audio/mp3';">
