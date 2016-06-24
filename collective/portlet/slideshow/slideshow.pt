@@ -25,13 +25,18 @@
                                 
                                 <div tal:define="item_url obj/getURL;"
                                     tal:attributes="data-title python: item_title; data-description python: item_description; data-url python: item_url;">
-                                    
+                                        
+                                        <tal:slideshowbtn tal:condition="first">
+                                            <div tal:condition="view/data/show_more" class="slideshow-btn-wrapper">
+                                                <input id="slideshow-btn" type="submit" class="btn btn-default" tal:attributes="value view/data/header"/>
+                                            </div>
+                                        </tal:slideshowbtn>
+
                                         <div class="inner-bg">
                                            <img
                                                  src="" alt=""
                                                  tal:attributes="src item_img; class python:'tileImage';" /> 
                                         </div>
-
                                         <tal:containsaudio tal:define="audio_file python: view.getAudioFile(obj.getObject())">
                                             <div tal:condition="python: audio_file != None"
                                                 tal:define="audio_url python: view.getAudioURL(audio_file);
@@ -93,6 +98,7 @@
                                                      data-pitch python:streetview_settings.get('pitch', '');
                                                      data-zoom python:streetview_settings.get('zoom', '');
                                                      data-addressControl python:streetview_settings.get('addressControl', '');
+                                                     data-headingLower python:streetview_settings.get('headingLower', '');
                                                      data-zoomControl python:streetview_settings.get('zoomControl', '');
                                                      data-linksControl python:streetview_settings.get('linksControl', '');
                                                      data-panControl python:streetview_settings.get('panControl', '');
