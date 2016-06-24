@@ -32,15 +32,15 @@
                                             </div>
                                         </tal:slideshowbtn>
 
-                                        <div class="inner-bg">
-                                           <img
-                                                 src="" alt=""
-                                                 tal:attributes="src item_img; class python:'tileImage';" /> 
-                                        </div>
                                         <tal:containsaudio tal:define="audio_file python: view.getAudioFile(obj.getObject())">
+                                            
                                             <div tal:condition="python: audio_file != None"
                                                 tal:define="audio_url python: view.getAudioURL(audio_file);
                                                             audio_contenttype python: 'audio/mp3'">
+
+                                                <div class="hi-icon-wrap hi-icon-effect-8">
+                                                    <span class="play-button hi-icon hi-icon-volume-off"></span>
+                                                </div>
                                                             
                                                 <audio controls class="audio-player">
                                                     <source src="" type="*/*"
@@ -53,7 +53,15 @@
                                                     </object>
                                                 </audio>
                                             </div>
+
                                         </tal:containsaudio>
+
+                                        <div class="inner-bg">
+                                           <img
+                                                 src="" alt=""
+                                                 tal:attributes="src item_img; class python:'tileImage';" /> 
+                                        </div>
+                                        
                                 </div>
 
                             </tal:hasimage>
@@ -90,6 +98,27 @@
                             <tal:streetview_settings tal:define="streetview_settings python:view.getStreetViewOptions(obj)"
                                 >
                                     <div>
+                                        <tal:containsaudio tal:define="audio_file python: view.getAudioFile(obj.getObject())">
+                                        <div tal:condition="python: audio_file != None"
+                                            tal:define="audio_url python: view.getAudioURL(audio_file);
+                                                        audio_contenttype python: 'audio/mp3';">
+                                            
+                                            <div class="hi-icon-wrap hi-icon-effect-8">
+                                                <span class="play-button hi-icon hi-icon-volume-off"></span>
+                                            </div>
+
+                                            <audio controls class="audio-player">
+                                                <source src="" type="*/*"
+                                                    tal:attributes="src audio_url; type audio_contenttype" />
+                                                <object width="" height=""
+                                                  type="application/x-shockwave-flash"
+                                                  data="++resource++collective.mediaelementjs/flashmediaelement.swf">
+                                                    <param name="audio" value="++resource++collective.mediaelementjs/flashmediaelement.swf" />
+                                                    <param name="flashvars" value="" tal:attributes="value python:'file=%s' % audio_url" />
+                                                </object>
+                                            </audio>
+                                        </div>
+                                    </tal:containsaudio>
                                     <div id="street-view" class="street-view" 
                                         tal:condition="streetview_settings"
                                         tal:attributes="data-lat python:streetview_settings.get('lat', '');
@@ -107,23 +136,7 @@
                                                      "
                                                      >
                                     </div>
-                                    <tal:containsaudio tal:define="audio_file python: view.getAudioFile(obj.getObject())">
-                                        <div tal:condition="python: audio_file != None"
-                                            tal:define="audio_url python: view.getAudioURL(audio_file);
-                                                        audio_contenttype python: 'audio/mp3';">
-                                                        
-                                            <audio controls class="audio-player">
-                                                <source src="" type="*/*"
-                                                    tal:attributes="src audio_url; type audio_contenttype" />
-                                                <object width="" height=""
-                                                  type="application/x-shockwave-flash"
-                                                  data="++resource++collective.mediaelementjs/flashmediaelement.swf">
-                                                    <param name="audio" value="++resource++collective.mediaelementjs/flashmediaelement.swf" />
-                                                    <param name="flashvars" value="" tal:attributes="value python:'file=%s' % audio_url" />
-                                                </object>
-                                            </audio>
-                                        </div>
-                                    </tal:containsaudio>
+                                    
                                     </div>
                             </tal:streetview_settings>
                         </tal:isstreetview>
