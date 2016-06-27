@@ -14,6 +14,7 @@
                         tal:define="item_type obj/portal_type;
                                     obj_id obj/getId;
                                     obj_brain obj/_brain;
+                                    obj_uid obj/UID;
                                     item_title obj/Title;
                                     item_description obj/Description;
                                     first repeat/obj/start">
@@ -133,6 +134,7 @@
                                                      data-panControl python:streetview_settings.get('panControl', '');
                                                      data-enableCloseButton python:streetview_settings.get('enableCloseButton', '');
                                                      data-fullscreenControl python:streetview_settings.get('fullscreenControl', '');
+                                                     data-uid obj_uid;
                                                      "
                                                      >
                                     </div>
