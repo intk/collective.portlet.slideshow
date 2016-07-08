@@ -79,6 +79,10 @@
                                         <tal:usepicture tal:condition="python: item_img != None">
                                             <div class="video-play-btn"></div>
 
+                                            <tal:slideshowbtn tal:condition="first">
+                                                <div tal:condition="view/data/show_dates" class="slideshow-btn-down"></div>
+                                            </tal:slideshowbtn>
+
                                             <img
                                                  src="" alt=""
                                                  tal:attributes="src item_img; class python:'tileImage overlay-image';" />
