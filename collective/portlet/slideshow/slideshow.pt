@@ -6,9 +6,9 @@
                 viewActions here/portal_properties/site_properties/typesUseViewActionInListings|python:();"
     tal:attributes="class string:portlet portletSlideshow ${view/css_class}">
 
-    <div class="slideshow" id="slickslideshow" tal:attributes="data-url collection_url">
-        <div class="slideshowWrapper">
-            <div class="slick-slideshow collection">
+    <div class="carousel" id="slickcarousel" tal:attributes="data-url collection_url">
+        <div class="carousel-wrapper">
+            <div class="slideshow-wrapper">
                 <tal:events tal:repeat="obj view/results">
                     <tal:definitions 
                         tal:define="item_type obj/portal_type;
@@ -24,13 +24,25 @@
                             
                             <tal:hasimage tal:condition="python: item_img != None">
                                 
-                                <div tal:define="item_url obj/getURL;"
-                                    tal:attributes="data-title python: item_title; data-description python: item_description; data-url python: item_url;">
+                                <div tal:define="item_url obj/getURL;
+                                                 item_path obj_brain/getPath|nothing;
+                                                 item_index repeat/obj/index;
+                                                 item_id obj_brain/getId|nothing;"
+
+                                    tal:attributes="data-title python: item_title; 
+                                                    data-description python: item_description; 
+                                                    data-url python: item_url;
+                                                    data-path python: item_path;
+                                                    data-id python: item_id;
+                                                    data-index python: item_index;
+                                                    class python: 'carousel-item first-slide' if first else 'carousel-item'" 
+                                                    >
                                         
                                         <tal:slideshowbtn tal:condition="first">
                                             <div tal:condition="view/data/show_more" class="slideshow-btn-wrapper">
                                                 <input id="slideshow-btn" type="submit" class="btn btn-default" tal:attributes="value view/data/header"/>
                                             </div>
+                                            <div class="slideshow-btn-down"></div>
                                         </tal:slideshowbtn>
 
                                         <tal:containsaudio tal:define="audio_file python: view.getAudioFile(obj.getObject())">
@@ -57,10 +69,10 @@
 
                                         </tal:containsaudio>
 
-                                        <div class="inner-bg">
+                                        <div class="carousel-image-wrapper">
                                            <img
                                                  src="" alt=""
-                                                 tal:attributes="src item_img; class python:'tileImage';" /> 
+                                                 tal:attributes="src item_img; class python:'carousel-image';" /> 
                                         </div>
                                         
                                 </div>
@@ -72,8 +84,19 @@
 
                             <div tal:define="item_url obj/getURL;
                                             remoteURL obj_brain/getRemoteUrl;
-                                            item_img python:view.getLeadMediaURL(obj);"
-                                tal:attributes="data-title python: item_title; data-description python: item_description; data-url python: item_url;" class="video-slide">
+                                            item_img python:view.getLeadMediaURL(obj);
+                                            item_path obj_brain/getPath|nothing;
+                                            item_index repeat/obj/index;
+                                            item_id obj_brain/getId|nothing;"
+
+                                            tal:attributes="data-title python: item_title; 
+                                                            data-description python: item_description; 
+                                                            data-url python: item_url;
+                                                            data-path python: item_path;
+                                                            data-id python: item_id;
+                                                            data-index python: item_index;" 
+
+                                                            class="carousel-item video-slide">
 
                                     <tal:firstslide>
                                         <tal:usepicture tal:condition="python: item_img != None">
@@ -83,10 +106,10 @@
                                                 <div tal:condition="view/data/show_dates" class="slideshow-btn-down"></div>
                                             </tal:slideshowbtn>
 
-                                            <img
-                                                 src="" alt=""
-                                                 tal:attributes="src item_img; class python:'tileImage overlay-image';" />
-                                            
+                                            <div class="carousel-image-wrapper">
+                                                <img src="" alt="" tal:attributes="src item_img; class python:'overlay-image';" />
+                                            </div>
+
                                             <iframe frameborder="0" allowfullscreen tal:attributes="id obj_id; src remoteURL" class="video-iframe with-overlay"></iframe>
                                         </tal:usepicture>
                                         
@@ -100,9 +123,21 @@
 
                         <tal:isstreetview tal:condition="python: item_type == 'StreetView'">
 
-                            <tal:streetview_settings tal:define="streetview_settings python:view.getStreetViewOptions(obj)"
+                            <tal:streetview_settings tal:define="streetview_settings python:view.getStreetViewOptions(obj);
+                                                                item_path obj_brain/getPath|nothing;
+                                                                item_index repeat/obj/index;
+                                                                item_id obj_brain/getId|nothing;
+                                                                item_url obj_brain/getURL|nothing;"
                                 >
-                                    <div>
+                                    <div class="carousel-item"
+                                        tal:attributes="
+                                            data-title python: item_title; 
+                                            data-description python: item_description; 
+                                            data-url python: item_url;
+                                            data-path python: item_path;
+                                            data-id python: item_id;
+                                            data-index python: item_index;" 
+                                        >
                                         <tal:containsaudio tal:define="audio_file python: view.getAudioFile(obj.getObject())">
                                         <div tal:condition="python: audio_file != None"
                                             tal:define="audio_url python: view.getAudioURL(audio_file);
@@ -124,6 +159,7 @@
                                             </audio>
                                         </div>
                                     </tal:containsaudio>
+
                                     <div id="street-view" class="street-view" 
                                         tal:condition="streetview_settings"
                                         tal:attributes="data-lat python:streetview_settings.get('lat', '');
@@ -146,8 +182,6 @@
                                     </div>
                             </tal:streetview_settings>
                         </tal:isstreetview>
-
-                        
                     </tal:definitions>
                 </tal:events>
             </div> 
