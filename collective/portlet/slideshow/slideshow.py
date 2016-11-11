@@ -283,11 +283,14 @@ class Renderer(base.Renderer):
 
     def getRelatedItems(self, item):
         if HAS_RELATIONFIELD and IRelatedItems.providedBy(item):
+            res = []
             related = item.relatedItems
             if not related:
                 return ()
             res = self.related2brains(related)
-        return res
+            return res
+        else:
+            return []
 
     def related2brains(self, related):
         """Return a list of brains based on a list of relations. Will filter
