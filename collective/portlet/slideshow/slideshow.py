@@ -17,6 +17,12 @@ import random
 import json
 import os
 import pkg_resources
+from plone.app.z3cform.widget import RichTextFieldWidget
+from plone.app.textfield.value import RichTextValue
+from Acquisition import aq_inner
+from plone.app.textfield import RichText
+from plone.autoform import directives
+from plone.i18n.normalizer.interfaces import IIDNormalizer
 
 COLLECTIONS = []
 
@@ -78,6 +84,13 @@ class ISlideshowPortlet(IPortletDataProvider):
         required=True,
         default=False)
 
+    directives.widget(text=RichTextFieldWidget)
+    text = RichText(
+        title=_(u"Text"),
+        description=_(u"The text to render"),
+        required=False)
+
+
     exclude_context = schema.Bool(
         title=_(u"Exclude the Current Context"),
         description=_(
@@ -102,12 +115,13 @@ class Assignment(base.Assignment):
     show_more = True
     show_dates = False
     exclude_context = False
+    text = u""
 
     # bbb
     target_collection = None
 
     def __init__(self, header=u"", uid=None, limit=None,
-                 random=False, show_more=True, show_dates=False,
+                 random=False, show_more=True, show_dates=False, text=u"",
                  exclude_context=True):
         self.header = header
         self.uid = uid
@@ -115,6 +129,7 @@ class Assignment(base.Assignment):
         self.random = random
         self.show_more = show_more
         self.show_dates = show_dates
+        self.text = text
         self.exclude_context = exclude_context
 
     @property
@@ -308,6 +323,46 @@ class Renderer(base.Renderer):
             brains.extend(catalog(path=dict(query=path, depth=0)))
         return brains
 
+    def transformed(self, mt='text/x-html-safe'):
+        """Use the safe_html transform to protect text output. This also
+        ensures that resolve UID links are transformed into real links.
+        """
+        orig = self.data.text
+        context = aq_inner(self.context)
+
+        if isinstance(orig, RichTextValue):
+            orig = orig.raw
+
+        if not isinstance(orig, unicode):
+            # Apply a potentially lossy transformation, and hope we stored
+            # utf-8 text. There were bugs in earlier versions of this portlet
+            # which stored text directly as sent by the browser, which could
+            # be any encoding in the world.
+            orig = unicode(orig, 'utf-8', 'ignore')
+            logger.warn(
+                "Static portlet at %s has stored non-unicode text. "
+                "Assuming utf-8 encoding." % context.absolute_url()
+            )
+
+        # Portal transforms needs encoded strings
+        orig = orig.encode('utf-8')
+
+        transformer = getToolByName(context, 'portal_transforms')
+        transformer_context = context
+        if hasattr(self, '__portlet_metadata__'):
+            if ('category' in self.__portlet_metadata__ and
+                    self.__portlet_metadata__['category'] == 'context'):
+                assignment_context_path = self.__portlet_metadata__['key']
+                assignment_context = context.unrestrictedTraverse(assignment_context_path)
+                transformer_context = assignment_context
+        data = transformer.convertTo(mt, orig,
+                                     context=transformer_context, mimetype='text/html')
+        result = data.getData()
+        if result:
+            if isinstance(result, str):
+                return unicode(result, 'utf-8')
+            return result
+        return None
 
 
 class AddForm(base.AddForm):
@@ -323,6 +378,6 @@ class AddForm(base.AddForm):
 
 class EditForm(base.EditForm):
     schema = ISlideshowPortlet
-    label = _(u"Edit Collection Portlet")
+    label = _(u"Edit Slideshow Portlet")
     description = _(u"This portlet displays a slideshow with items from a "
                     u"Collection.")
